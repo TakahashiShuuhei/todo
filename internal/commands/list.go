@@ -2,8 +2,7 @@ package commands
 
 import (
 	"fmt"
-	"os"
-	"text/tabwriter"
+	"time"
 
 	"github.com/TakahashiShuuhei/todo/internal/utils"
 	"github.com/spf13/cobra"
@@ -39,11 +38,6 @@ var listCmd = &cobra.Command{
 			return nil
 		}
 
-		// タブライターを初期化
-		w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-		fmt.Fprintln(w, "ID\tStatus\tTitle\tDescription\tCreated At\tUpdated At")
-		fmt.Fprintln(w, "--\t------\t-----\t-----------\t----------\t----------")
-
 		// タスクを表示
 		for _, todo := range *todos {
 			// アーカイブされていないタスクのみを表示（showArchivedがfalseの場合）
@@ -59,16 +53,12 @@ var listCmd = &cobra.Command{
 				status = "🗄"
 			}
 
-			fmt.Fprintf(w, "%d\t%s\t%s\t%s\t%s\t%s\n",
-				todo.ID,
-				status,
-				todo.Title,
-				todo.Description,
-				todo.CreatedAt.Format("2006-01-02 15:04:05"),
-				todo.UpdatedAt.Format("2006-01-02 15:04:05"),
-			)
+			fmt.Printf("%s [%d] %s\n", status, todo.ID, todo.Title)
+			if todo.Description != "" {
+				fmt.Printf("    %s\n", todo.Description)
+			}
+			fmt.Printf("    Created: %s\n", todo.CreatedAt.Format(time.RFC3339))
 		}
-		w.Flush()
 		return nil
 	},
 }
