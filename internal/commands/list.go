@@ -28,15 +28,18 @@ func PrintTodos(todos *models.TodoList, showArchived bool) {
 			continue
 		}
 
-		status := " "
+		// 完了状態とアーカイブ状態を別々に表示
+		completionStatus := " "
 		if todo.Completed {
-			status = "✓"
-		}
-		if todo.Archived {
-			status = "🗄"
+			completionStatus = "✓"
 		}
 
-		fmt.Printf("%s [%d] %s\n", status, todo.ID, todo.Title)
+		archiveStatus := " "
+		if todo.Archived {
+			archiveStatus = "🗄"
+		}
+
+		fmt.Printf("%s%s [%d] %s\n", completionStatus, archiveStatus, todo.ID, todo.Title)
 		if todo.Description != "" {
 			fmt.Printf("    %s\n", todo.Description)
 		}
