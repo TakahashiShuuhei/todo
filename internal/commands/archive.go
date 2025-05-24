@@ -49,6 +49,8 @@ var archiveCmd = &cobra.Command{
 				return fmt.Errorf("failed to save todos: %w", err)
 			}
 			fmt.Println("All tasks archived!")
+			fmt.Println() // 空行を追加
+			PrintTodos(todos, false)
 			return nil
 		}
 
@@ -71,6 +73,8 @@ var archiveCmd = &cobra.Command{
 						status = "unarchived"
 					}
 					fmt.Printf("Task %d %s\n", id, status)
+					fmt.Println() // 空行を追加
+					PrintTodos(todos, false)
 					return nil
 				}
 			}
@@ -112,6 +116,8 @@ var archiveCmd = &cobra.Command{
 		}
 
 		fmt.Println("Tasks updated successfully!")
+		fmt.Println() // 空行を追加
+		PrintTodos(todos, false)
 		return nil
 	},
 }

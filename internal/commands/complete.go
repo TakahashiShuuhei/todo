@@ -55,6 +55,8 @@ var completeCmd = &cobra.Command{
 						status = "uncompleted"
 					}
 					fmt.Printf("Task %d %s\n", id, status)
+					fmt.Println() // 空行を追加
+					PrintTodos(todos, false)
 					return nil
 				}
 			}
@@ -96,6 +98,8 @@ var completeCmd = &cobra.Command{
 		}
 
 		fmt.Println("Tasks updated successfully!")
+		fmt.Println() // 空行を追加
+		PrintTodos(todos, false)
 		return nil
 	},
 }

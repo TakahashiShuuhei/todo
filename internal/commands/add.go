@@ -14,7 +14,6 @@ var addCmd = &cobra.Command{
 	Aliases: []string{"a"},
 	Short:   "Add a new task",
 	Long:    `Add a new task with a title and optional description.`,
-	Args:    cobra.RangeArgs(1, 2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		// Todoファイルを探す
 		todoPath, err := utils.FindTodoFile()
@@ -25,20 +24,21 @@ var addCmd = &cobra.Command{
 			return fmt.Errorf("todo file not found. please run 'todo init' first")
 		}
 
-		// 既存のタスクを読み込む
+		// タスクを読み込む
 		todos, err := utils.LoadTodos(todoPath)
 		if err != nil {
 			return fmt.Errorf("failed to load todos: %w", err)
 		}
 
 		// 新しいタスクを作成
-		now := time.Now()
 		newTodo := models.Todo{
-			ID:        len(*todos) + 1,
-			Title:     args[0],
-			Completed: false,
-			CreatedAt: now,
-			UpdatedAt: now,
+			ID:          len(*todos) + 1,
+			Title:       args[0],
+			Description: "",
+			Completed:   false,
+			Archived:    false,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
 		}
 
 		// 説明が指定されている場合は追加
@@ -49,12 +49,18 @@ var addCmd = &cobra.Command{
 		// タスクを追加
 		*todos = append(*todos, newTodo)
 
-		// 保存
+		// タスクを保存
 		if err := utils.SaveTodos(todoPath, todos); err != nil {
 			return fmt.Errorf("failed to save todos: %w", err)
 		}
 
 		fmt.Printf("Added task: %s\n", newTodo.Title)
+		fmt.Println() // 空行を追加
+		PrintTodos(todos, false)
 		return nil
 	},
+}
+
+func init() {
+	addCmd.Args = cobra.RangeArgs(1, 2)
 }

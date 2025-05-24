@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/TakahashiShuuhei/todo/internal/models"
 	"github.com/TakahashiShuuhei/todo/internal/utils"
 	"github.com/spf13/cobra"
 )
@@ -11,6 +12,36 @@ import (
 var (
 	showArchived bool
 )
+
+// PrintTodos prints the list of todos
+func PrintTodos(todos *models.TodoList, showArchived bool) {
+	if len(*todos) == 0 {
+		fmt.Println("No tasks found.")
+		return
+	}
+
+	// タスクを表示
+	for _, todo := range *todos {
+		// アーカイブされていないタスクのみを表示（showArchivedがfalseの場合）
+		if !showArchived && todo.Archived {
+			continue
+		}
+
+		status := " "
+		if todo.Completed {
+			status = "✓"
+		}
+		if todo.Archived {
+			status = "🗄"
+		}
+
+		fmt.Printf("%s [%d] %s\n", status, todo.ID, todo.Title)
+		if todo.Description != "" {
+			fmt.Printf("    %s\n", todo.Description)
+		}
+		fmt.Printf("    Created: %s\n", todo.CreatedAt.Format(time.RFC3339))
+	}
+}
 
 var listCmd = &cobra.Command{
 	Use:     "list",
@@ -33,32 +64,7 @@ var listCmd = &cobra.Command{
 			return fmt.Errorf("failed to load todos: %w", err)
 		}
 
-		if len(*todos) == 0 {
-			fmt.Println("No tasks found.")
-			return nil
-		}
-
-		// タスクを表示
-		for _, todo := range *todos {
-			// アーカイブされていないタスクのみを表示（showArchivedがfalseの場合）
-			if !showArchived && todo.Archived {
-				continue
-			}
-
-			status := " "
-			if todo.Completed {
-				status = "✓"
-			}
-			if todo.Archived {
-				status = "🗄"
-			}
-
-			fmt.Printf("%s [%d] %s\n", status, todo.ID, todo.Title)
-			if todo.Description != "" {
-				fmt.Printf("    %s\n", todo.Description)
-			}
-			fmt.Printf("    Created: %s\n", todo.CreatedAt.Format(time.RFC3339))
-		}
+		PrintTodos(todos, showArchived)
 		return nil
 	},
 }
