@@ -7,8 +7,9 @@ type Todo struct {
 	Title       string    `json:"title"`
 	Description string    `json:"description,omitempty"`
 	Completed   bool      `json:"completed"`
+	Archived    bool      `json:"archived"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }
 
-type TodoList []Todo 
+type TodoList []Todo

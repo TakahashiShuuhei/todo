@@ -2,17 +2,22 @@ package commands
 
 import (
 	"fmt"
-	"time"
+	"os"
+	"text/tabwriter"
 
 	"github.com/TakahashiShuuhei/todo/internal/utils"
 	"github.com/spf13/cobra"
+)
+
+var (
+	showArchived bool
 )
 
 var listCmd = &cobra.Command{
 	Use:     "list",
 	Aliases: []string{"l"},
 	Short:   "List all tasks",
-	Long:    `List all tasks with their status and details.`,
+	Long:    `List all tasks in the todo list.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		// Todoファイルを探す
 		todoPath, err := utils.FindTodoFile()
@@ -34,20 +39,40 @@ var listCmd = &cobra.Command{
 			return nil
 		}
 
-		// タスク一覧を表示
+		// タブライターを初期化
+		w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
+		fmt.Fprintln(w, "ID\tStatus\tTitle\tDescription\tCreated At\tUpdated At")
+		fmt.Fprintln(w, "--\t------\t-----\t-----------\t----------\t----------")
+
+		// タスクを表示
 		for _, todo := range *todos {
-			status := "□"
+			// アーカイブされていないタスクのみを表示（showArchivedがfalseの場合）
+			if !showArchived && todo.Archived {
+				continue
+			}
+
+			status := " "
 			if todo.Completed {
-				status = "■"
+				status = "✓"
+			}
+			if todo.Archived {
+				status = "🗄"
 			}
 
-			fmt.Printf("%s [%d] %s\n", status, todo.ID, todo.Title)
-			if todo.Description != "" {
-				fmt.Printf("    %s\n", todo.Description)
-			}
-			fmt.Printf("    Created: %s\n", todo.CreatedAt.Format(time.RFC3339))
+			fmt.Fprintf(w, "%d\t%s\t%s\t%s\t%s\t%s\n",
+				todo.ID,
+				status,
+				todo.Title,
+				todo.Description,
+				todo.CreatedAt.Format("2006-01-02 15:04:05"),
+				todo.UpdatedAt.Format("2006-01-02 15:04:05"),
+			)
 		}
-
+		w.Flush()
 		return nil
 	},
+}
+
+func init() {
+	listCmd.Flags().BoolVarP(&showArchived, "archived", "a", false, "Show archived tasks")
 }
