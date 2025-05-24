@@ -4,8 +4,36 @@
 
 ## インストール
 
+### 前提条件
+
+- Go 1.21以上がインストールされていること
+- インターネット接続があること
+
+### インストール方法
+
 ```bash
-go install github.com/TakahashiShuuhei/todo@latest
+# 最新版をインストール
+go install github.com/TakahashiShuuhei/todo/cmd/todo@latest
+
+# 特定のバージョンをインストールする場合
+go install github.com/TakahashiShuuhei/todo/cmd/todo@v1.0.0
+```
+
+インストール後、`$GOPATH/bin`がPATHに含まれていることを確認してください。
+
+### ローカルでのインストール
+
+リポジトリをクローンしてローカルでインストールする場合：
+
+```bash
+# リポジトリをクローン
+git clone https://github.com/TakahashiShuuhei/todo.git
+
+# ディレクトリに移動
+cd todo
+
+# インストール
+go install ./cmd/todo
 ```
 
 ## 使い方
