@@ -63,15 +63,29 @@ var completeCmd = &cobra.Command{
 			return fmt.Errorf("task with ID %d not found", id)
 		}
 
+		// アーカイブされていないタスクのみをフィルタリング
+		var activeTodos []int
+		for i, todo := range *todos {
+			if !todo.Archived {
+				activeTodos = append(activeTodos, i)
+			}
+		}
+
+		if len(activeTodos) == 0 {
+			fmt.Println("No active tasks found.")
+			return nil
+		}
+
 		// インタラクティブな選択UI
 		var selected []int
-		options := make([]huh.Option[int], len(*todos))
-		for i, todo := range *todos {
+		options := make([]huh.Option[int], len(activeTodos))
+		for i, idx := range activeTodos {
+			todo := (*todos)[idx]
 			status := " "
 			if todo.Completed {
 				status = "✓"
 			}
-			options[i] = huh.NewOption(fmt.Sprintf("[%d] %s %s", todo.ID, status, todo.Title), i)
+			options[i] = huh.NewOption(fmt.Sprintf("[%d] %s %s", todo.ID, status, todo.Title), idx)
 		}
 
 		form := huh.NewForm(
